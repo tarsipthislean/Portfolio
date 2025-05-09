@@ -1,4 +1,5 @@
-import { ArrowRight, ExternalLink, Github } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, X } from "lucide-react";
+import { useState } from "react";
 
 const projects = [
   {
@@ -8,7 +9,7 @@ const projects = [
       "พัฒนาเว็บแอปแอดมินแดชบอร์ดแบบ Full-Stack ด้วย Next.js, React, Clerk, MongoDB และ Tailwind CSS พร้อมตรวจสอบข้อมูลด้วย React Hook Form และ Zod",
     image: "/projects/project1.png",
     tags: ["Nextjs", "TailwindCSS", "MongoDB"],
-    demoUrl: "https://github.com/tarsipthislean/BruAdmin_Dashboard",
+    demoUrl: "https://bru-admin.vercel.app/",
     githubUrl: "https://github.com/tarsipthislean/BruAdmin_Dashboard",
   },
   {
@@ -45,6 +46,16 @@ const projects = [
 ];
 
 export const ProjectsSection = () => {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageClick = (image, title) => {
+    setSelectedImage({ image, title });
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
     <section id="projects" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-7xl">
@@ -63,35 +74,44 @@ export const ProjectsSection = () => {
           {projects.map((project, key) => (
             <div
               key={key}
-              className="group bg-card rounded-lg overflow-hidden shadow-xs card-hover relative"
+              className="group bg-card rounded-lg overflow-hidden shadow-xs card-hover"
             >
-              <div className="h-55 overflow-hidden">
+              {/* Changed image container to maintain aspect ratio and contain full image */}
+              <div
+                className="relative w-full aspect-video bg-gray-100 cursor-pointer"
+                onClick={() => handleImageClick(project.image, project.title)}
+              >
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 
-              <div className="p-6">
+              {/* Added relative positioning and min-height to ensure consistent card heights */}
+              <div className="p-6 relative min-h-[280px]">
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.tags.map((tag) => (
-                    <span className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground">
+                    <span
+                      key={tag}
+                      className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground"
+                    >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <h3 className="text-xl font-semibold mb-1"> {project.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4">
+                <h3 className="text-xl font-semibold mb-2"> {project.title}</h3>
+                <p className="text-muted-foreground text-sm mb-16">
                   {project.description}
                 </p>
 
-                {/* Positioning the links at the bottom-left with extra padding-top */}
-                <div className="absolute bottom-4 left-4 flex space-x-3 pt-9">
+                {/* Links positioned at the bottom */}
+                <div className="absolute bottom-6 left-6 flex space-x-4">
                   <a
                     href={project.demoUrl}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-foreground/80 hover:text-primary transition-colors duration-300"
                   >
                     <ExternalLink size={20} />
@@ -99,6 +119,7 @@ export const ProjectsSection = () => {
                   <a
                     href={project.githubUrl}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-foreground/80 hover:text-primary transition-colors duration-300"
                   >
                     <Github size={20} />
@@ -113,12 +134,39 @@ export const ProjectsSection = () => {
           <a
             className="cosmic-button w-fit flex items-center mx-auto gap-2"
             target="_blank"
+            rel="noopener noreferrer"
             href="https://github.com/tarsipthislean"
           >
             Github ของฉัน <ArrowRight size={16} />
           </a>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={closeModal}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <button
+              onClick={closeModal}
+              className="absolute -top-12 right-0 p-2 text-white bg-black/50 rounded-full hover:bg-black/70 transition-colors duration-200"
+            >
+              <X size={24} />
+            </button>
+            <img
+              src={selectedImage.image}
+              alt={selectedImage.title}
+              className="w-full h-full object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/70 px-4 py-2 rounded-full text-sm font-medium">
+              {selectedImage.title}
+            </p>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
